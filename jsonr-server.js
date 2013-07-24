@@ -18,6 +18,13 @@
 var http = require('http'),
     fs = require('fs'),
     jsonr = require('./jsonr-module'),
+
+// Creates the data model: cities have references to countries and each country have a
+// reference to a capital. This brings both multiple references to the same object (eg.
+// Washington DC and New York point to the same country instance: USA) and circular
+// references (eg. Washington DC points to USA which have a reference to Washington DC
+// as its capital).
+
     countries = [
         { name: 'USA', language: 'English' },
         { name: 'France', language: 'French' },
@@ -35,6 +42,8 @@ var http = require('http'),
         { name: 'Bangalore', country: countries[2] }
     ];
 
+// Circular references:
+
 countries[0].capital = cities[0];
 countries[1].capital = cities[3];
 countries[2].capital = cities[5];
@@ -45,6 +54,9 @@ http.createServer(function (req, res) {
 
     console.log('Serving ' + req.url);
 
+// Stringifies all cities with jsonr, logs jsonr data (with human readable references)
+// and returns the data.
+
     if (req.url === '/cities') {
         data = jsonr.stringify(cities, null, '\t');
         console.log(jsonr.revealReferences(data));
@@ -52,6 +64,9 @@ http.createServer(function (req, res) {
         res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
         res.write(data);
         res.end();
+
+// Logs posted jsonr data (with human readable references), parses them and returns
+// an empty response.
 
     } else if (req.url === '/new-cities') {
         data = '';
@@ -63,6 +78,8 @@ http.createServer(function (req, res) {
             res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
             res.end();
         });
+
+// Serves html / js files.
 
     } else {
         fs.readFile('.' + req.url, function (err, content) {
