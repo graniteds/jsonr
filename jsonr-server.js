@@ -19,7 +19,7 @@ var http = require('http'),
     fs = require('fs'),
     jsonr = require('./jsonr-module'),
 
-// Creates the data model: cities have references to countries and each country have a
+// Creates the data model: cities have references to countries and each country has a
 // reference to a capital. This brings both multiple references to the same object (eg.
 // Washington DC and New York point to the same country instance: USA) and circular
 // references (eg. Washington DC points to USA which have a reference to Washington DC
