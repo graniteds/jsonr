@@ -11,12 +11,6 @@
     Based on the work of Douglas Crockford
     See http://www.JSON.org/js.html
 
-    This code should be minified before deployment.
-    See http://javascript.crockford.com/jsmin.html
-
-    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
-    NOT CONTROL.
-
     This file define a Node.js module exporting four methods: stringify,
     isReference, revealReferences and parse:
 
