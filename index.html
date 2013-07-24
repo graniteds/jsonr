@@ -12,92 +12,92 @@
     A sample HTML file using jsonr.
 -->
 <head>
-	<meta charset="utf-8" />
-	<title>JSONR Test</title>
-	<script type="text/javascript" src="jsonr.js"></script>
-	<script type="text/javascript">
+    <meta charset="utf-8" />
+    <title>JSONR Test</title>
+    <script type="text/javascript" src="jsonr.js"></script>
+    <script type="text/javascript">
 
-		function getAllCities() {
-			var xhr = new XMLHttpRequest();
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState === 4 && (xhr.status === 200 || xhr.status === 0)) {
-					var res = xhr.responseText,
-						cities = JSONR.parse(res),
-					    div = document.getElementById('data');
-						
-					var innerHTML = '<h3>Cities</h3><div>';
+        function getAllCities() {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && (xhr.status === 200 || xhr.status === 0)) {
+                    var res = xhr.responseText,
+                        cities = JSONR.parse(res),
+                        div = document.getElementById('data');
+                        
+                    var innerHTML = '<h3>Cities</h3><div>';
 
-					var country = null;
-					for (var i = 0; i < cities.length; i++) {
-						var city = cities[i];
+                    var country = null;
+                    for (var i = 0; i < cities.length; i++) {
+                        var city = cities[i];
 
-						if (country !== null && city.country !== country) {
-							innerHTML += '<br />';
-						}
-						country = city.country;
+                        if (country !== null && city.country !== country) {
+                            innerHTML += '<br />';
+                        }
+                        country = city.country;
 
-						innerHTML += '<div>' +
-							city.name  + " - " +
-							city.country.name + ' - ' +
-							city.country.language +
-							(city === city.country.capital ? ' (Capital)' : '') +
-							'</div>';
-					}
-					innerHTML += '</div>';
+                        innerHTML += '<div>' +
+                            city.name  + " - " +
+                            city.country.name + ' - ' +
+                            city.country.language +
+                            (city === city.country.capital ? ' (Capital)' : '') +
+                            '</div>';
+                    }
+                    innerHTML += '</div>';
 
-					innerHTML +=
-						'<div><h3>Jsonr data with revealed references (eg. "^1"):</h3></div>' +
-						'<pre>' + JSONR.revealReferences(res) + '</pre>';
+                    innerHTML +=
+                        '<div><h3>Jsonr data with revealed references (eg. "^1"):</h3></div>' +
+                        '<pre>' + JSONR.revealReferences(res) + '</pre>';
 
-					div.innerHTML = innerHTML;
-				}
-			};
-			xhr.open('POST', 'cities', true);
-			xhr.send();
-		}
+                    div.innerHTML = innerHTML;
+                }
+            };
+            xhr.open('POST', 'cities', true);
+            xhr.send();
+        }
 
-		function createBrazilianCities() {
-			var brazil = { name: 'Brazil', language: 'Portuguese' },
-				newCities = [
-					{ name: 'Brasilia', country: brazil },
-					{ name: 'Rio de Janeiro', country: brazil },
-					{ name: 'Bel Horizonte', country: brazil },
-				];
+        function createBrazilianCities() {
+            var brazil = { name: 'Brazil', language: 'Portuguese' },
+                newCities = [
+                    { name: 'Brasilia', country: brazil },
+                    { name: 'Rio de Janeiro', country: brazil },
+                    { name: 'Bel Horizonte', country: brazil },
+                ];
 
-			brazil.capital = newCities[0];
+            brazil.capital = newCities[0];
 
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', 'new-cities', false);
-			xhr.send(JSONR.stringify(newCities, null, '\t'));
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'new-cities', false);
+            xhr.send(JSONR.stringify(newCities, null, '\t'));
 
-			getAllCities();
-		}
+            getAllCities();
+        }
 
-		function creatChineseCities() {
-			var china = { name: 'China', language: 'Chinese' },
-				newCities = [
-					{ name: 'Beijing', country: china },
-					{ name: 'Shanghai', country: china },
-					{ name: 'Hong Kong', country: china },
-				];
+        function creatChineseCities() {
+            var china = { name: 'China', language: 'Chinese' },
+                newCities = [
+                    { name: 'Beijing', country: china },
+                    { name: 'Shanghai', country: china },
+                    { name: 'Hong Kong', country: china },
+                ];
 
-			china.capital = newCities[0];
+            china.capital = newCities[0];
 
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', 'new-cities', false);
-			xhr.send(JSONR.stringify(newCities, null, '\t'));
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'new-cities', false);
+            xhr.send(JSONR.stringify(newCities, null, '\t'));
 
-			getAllCities();
-		}
-	</script>
+            getAllCities();
+        }
+    </script>
 </head>
 <body>
-	<h2>JSONR Test</h2>
-	<input type="button" value="getAllCities()" onclick="getAllCities()" />
-	<input type="button" value="createBrazilianCities()" onclick="createBrazilianCities()" />
-	<input type="button" value="creatChineseCities()" onclick="creatChineseCities()" />
-	<br />
-	<div id="data">
-	</div>
+    <h2>JSONR Test</h2>
+    <input type="button" value="getAllCities()" onclick="getAllCities()" />
+    <input type="button" value="createBrazilianCities()" onclick="createBrazilianCities()" />
+    <input type="button" value="creatChineseCities()" onclick="creatChineseCities()" />
+    <br />
+    <div id="data">
+    </div>
 </body>
 </html>
