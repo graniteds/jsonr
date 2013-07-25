@@ -93,6 +93,7 @@ var escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u2
         '\\': '\\\\'
     },
     rep,
+    dy,
     maxi = 0xF8FF - 0xE000;
 
 function esc(a) {
@@ -121,7 +122,7 @@ function quote(string) {
 }
 
 
-function str(dy, key, holder) {
+function str(key, holder) {
 
     var i,
         k,
@@ -132,21 +133,9 @@ function str(dy, key, holder) {
         partial,
         value = holder[key];
 
-    if (value !== null && typeof value === 'object' && typeof value.toJSON === 'function') {
+    if (value !== null && typeof value === 'object' &&
+            typeof value.toJSON === 'function') {
         value = value.toJSON(key);
-    }
-
-    if (value !== null && typeof value === 'object') {
-        i = dy.indexOf(value);
-        if (i !== -1) {
-            return '"' + String.fromCharCode(0xE000 + i) + '"';
-        }
-
-        if (dy.length > maxi) {
-            throw new Error('JSONR.stringify: too many references');
-        }
-
-        dy.push(value);
     }
 
     if (typeof rep === 'function') {
@@ -170,6 +159,17 @@ function str(dy, key, holder) {
             return 'null';
         }
 
+        i = dy.indexOf(value);
+        if (i !== -1) {
+            return '"' + String.fromCharCode(0xE000 + i) + '"';
+        }
+
+        if (dy.length > maxi) {
+            throw new Error('JSONR.stringify: too many references');
+        }
+
+        dy.push(value);
+
         gap += indent;
         partial = [];
 
@@ -177,7 +177,7 @@ function str(dy, key, holder) {
 
             length = value.length;
             for (i = 0; i < length; i += 1) {
-                partial[i] = str(dy, i, value) || 'null';
+                partial[i] = str(i, value) || 'null';
             }
 
             v = partial.length === 0
@@ -190,22 +190,22 @@ function str(dy, key, holder) {
         }
 
         if (rep && typeof rep === 'object') {
+
             length = rep.length;
             for (i = 0; i < length; i += 1) {
-                if (typeof rep[i] === 'string') {
-                    k = rep[i];
-                    v = str(dy, k, value);
-                    if (v) {
-                        partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                    }
+                k = rep[i];
+                v = str(k, value);
+                if (v) {
+                    partial.push(quote(k) + (gap ? ': ' : ':') + v);
                 }
             }
         } else {
+
             ks = Object.keys(value).sort();
             length = ks.length;
             for (i = 0; i < length; i += 1) {
                 k = ks[i];
-                v = str(dy, k, value);
+                v = str(k, value);
                 if (v) {
                     partial.push(quote(k) + (gap ? ': ' : ':') + v);
                 }
@@ -223,11 +223,9 @@ function str(dy, key, holder) {
 }
 
 exports.stringify = function (value, replacer, space) {
+    var i, s;
 
-    var i;
-    gap = '';
     indent = '';
-
     if (typeof space === 'number') {
         for (i = 0; i < space; i += 1) {
             indent += ' ';
@@ -236,14 +234,35 @@ exports.stringify = function (value, replacer, space) {
         indent = space;
     }
 
-    rep = replacer;
-    if (replacer && typeof replacer !== 'function' &&
-            (typeof replacer !== 'object' ||
-            typeof replacer.length !== 'number')) {
-        throw new Error('JSONR.stringify: illegal replacer');
+    rep = null;
+    if (replacer) {
+        if (typeof replacer === 'function') {
+            rep = replacer;
+        } else if (Object.prototype.toString.apply(replacer) === '[object Array]') {
+            for (i = 0; i < replacer.length; i += 1) {
+                if (typeof replacer[i] !== 'string') {
+                    throw new Error('JSONR.stringify: illegal replacer');
+                }
+            }
+            rep = replacer.concat().sort();
+        } else {
+            throw new Error('JSONR.stringify: illegal replacer');
+        }
     }
 
-    return str([], '', {'': value});
+    gap = '';
+    dy = [];
+
+    try {
+        s = str('', {'': value});
+    } finally {
+        gap = null;
+        indent = null;
+        rep = null;
+        dy = null;
+    }
+
+    return s;
 };
 
 exports.isReference = function (value) {
@@ -256,14 +275,25 @@ exports.isReference = function (value) {
 };
 
 exports.revealReferences = function (text) {
-    var indexes = /\"[\uE000-\uF8FF]\"/g;
+    var begins = /"(?:[^"\\]|\\.)*"|[\[\{]/g,
+        indexes = /\"[\uE000-\uF8FF]\"/g,
+        index = 0;
+
+    text = begins.test(text) ? text.replace(begins, function (s) {
+        if (s.charAt(0) !== '"') {
+            s = '@' + index + s;
+            index += 1;
+        }
+        return s;
+        
+    }) : text;
 
     return indexes.test(text) ? text.replace(indexes, function (i) {
-        return '"^' + (i.charCodeAt(1) - 0xE000) + '"';
+        return '"@' + (i.charCodeAt(1) - 0xE000) + '"';
     }) : text;
 };
 
-function unref(dy, value) {
+function unref(value) {
     var c, i, k, ks, length;
 
     switch (typeof value) {
@@ -290,14 +320,14 @@ function unref(dy, value) {
             if (Object.prototype.toString.apply(value) === '[object Array]') {
                 length = value.length;
                 for (i = 0; i < length; i += 1) {
-                    value[i] = unref(dy, value[i]);
+                    value[i] = unref(value[i]);
                 }
             } else {
                 ks = Object.keys(value).sort();
                 length = ks.length;
                 for (i = 0; i < length; i += 1) {
                     k = ks[i];
-                    value[k] = unref(dy, value[k]);
+                    value[k] = unref(value[k]);
                 }
             }
         }
@@ -309,5 +339,11 @@ function unref(dy, value) {
 
 exports.parse = function (text, reviver) {
     var value = JSON.parse(text, reviver);
-    return unref([], value);
+    dy = [];
+    try {
+        value = unref(value);
+    } finally {
+        dy = null;
+    }
+    return value;
 };
