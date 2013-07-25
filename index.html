@@ -13,7 +13,7 @@
 -->
 <head>
     <meta charset="utf-8" />
-    <title>JSONR Test</title>
+    <title>JsonR Test</title>
     <script type="text/javascript" src="jsonr.js"></script>
     <script type="text/javascript">
 
@@ -46,7 +46,7 @@
                     innerHTML += '</div>';
 
                     innerHTML +=
-                        '<div><h3>Jsonr data with revealed references (eg. "^1"):</h3></div>' +
+                        '<div><h3>JsonR data with revealed references (eg. "@1" -> @1{...}):</h3></div>' +
                         '<pre>' + JSONR.revealReferences(res) + '</pre>';
 
                     div.innerHTML = innerHTML;
