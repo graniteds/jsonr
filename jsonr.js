@@ -82,6 +82,7 @@
 
 */
 
+/*jslint regexp: true*/
 /*global JSONR:true*/
 
 if (typeof JSONR !== 'object') {
@@ -303,7 +304,6 @@ if (typeof JSONR !== 'object') {
                     index += 1;
                 }
                 return s;
-                
             }) : text;
 
             return indexes.test(text) ? text.replace(indexes, function (i) {

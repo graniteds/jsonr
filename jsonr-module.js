@@ -285,7 +285,6 @@ exports.revealReferences = function (text) {
             index += 1;
         }
         return s;
-        
     }) : text;
 
     return indexes.test(text) ? text.replace(indexes, function (i) {
