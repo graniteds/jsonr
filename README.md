@@ -1,7 +1,7 @@
 jsonr
 =====
 
-JsonR is a JSON implementation that deals with multiple / circular references.
+JsonR is a JSON implementation that deals with multiple / circular references. You can find a detailed explanation of this library in a dedicated DZone article: http://java.dzone.com/articles/json-r-json-extension-deals.
 
 Testing with Node.js
 --------------------
