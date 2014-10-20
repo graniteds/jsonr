@@ -216,7 +216,7 @@ if (typeof JSONR !== 'object') {
                     }
                 } else {
 
-                    ks = Object.keys(value).sort();
+                    ks = Object.keys(value);
                     length = ks.length;
                     for (i = 0; i < length; i += 1) {
                         k = ks[i];
