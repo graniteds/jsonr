@@ -201,7 +201,7 @@ function str(key, holder) {
             }
         } else {
 
-            ks = Object.keys(value).sort();
+            ks = Object.keys(value);
             length = ks.length;
             for (i = 0; i < length; i += 1) {
                 k = ks[i];
@@ -244,7 +244,7 @@ exports.stringify = function (value, replacer, space) {
                     throw new Error('JSONR.stringify: illegal replacer');
                 }
             }
-            rep = replacer.concat().sort();
+            rep = replacer.concat();
         } else {
             throw new Error('JSONR.stringify: illegal replacer');
         }
@@ -322,7 +322,7 @@ function unref(value) {
                     value[i] = unref(value[i]);
                 }
             } else {
-                ks = Object.keys(value).sort();
+                ks = Object.keys(value);
                 length = ks.length;
                 for (i = 0; i < length; i += 1) {
                     k = ks[i];
